@@ -1,5 +1,5 @@
 # Change Log
-All notable changes to Tab Search Plus will be documented in this file.
+All notable changes to Chrome Tab Search will be documented in this file.
 
 ## [1.0.0]
 ### Added
@@ -8,3 +8,4 @@ All notable changes to Tab Search Plus will be documented in this file.
 - Add tab group color and name indicators when Firefox exposes tab group data.
 - Add dark-mode support and configurable keyboard shortcut support.
 - Add Firefox Add-ons publishing metadata and GitHub Actions release workflow.
+- Rename the extension and repository identity to Chrome Tab Search.

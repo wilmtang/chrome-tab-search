@@ -1,11 +1,13 @@
 {
   "manifest_version": 2,
-  "name": "Tab Search Plus",
+  "name": "Chrome Tab Search",
   "version": "1.0.0",
   "description": "Chrome-style tab search for Firefox with tab switching, tab closing, recently closed restore, and tab group indicators.",
   "icons": {
-    "48": "icons/tab-search-plus.svg",
-    "128": "icons/tab-search-plus.svg"
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
   },
   "permissions": [
     "tabs",
@@ -14,11 +16,13 @@
     "tabGroups"
   ],
   "browser_action": {
-    "default_title": "Search Tabs",
+    "default_title": "Chrome Tab Search",
     "default_popup": "popup.html",
     "default_icon": {
-      "48": "icons/tab-search-plus.svg",
-      "128": "icons/tab-search-plus.svg"
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
     }
   },
   "commands": {
@@ -27,7 +31,7 @@
         "default": "Ctrl+Alt+A",
         "mac": "Command+MacCtrl+A"
       },
-      "description": "Open Tab Search"
+      "description": "Open Chrome Tab Search"
     }
   },
   "options_ui": {
@@ -37,7 +41,7 @@
   "content_security_policy": "script-src 'self'; object-src 'self'; img-src 'self' data: http: https: moz-anno: chrome:;",
   "browser_specific_settings": {
     "gecko": {
-      "id": "tab-search-plus@zihaod.dev",
+      "id": "chrome-tab-search@zihaod.dev",
       "data_collection_permissions": {
         "required": [
           "none"

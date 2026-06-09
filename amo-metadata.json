@@ -1,12 +1,12 @@
 {
   "name": {
-    "en-US": "Tab Search Plus"
+    "en-US": "Chrome Tab Search"
   },
   "summary": {
     "en-US": "Chrome-style tab search for Firefox, including open-tab search, tab closing, recent tab restore, and tab group indicators."
   },
   "description": {
-    "en-US": "Tab Search Plus is for Firefox users who miss the exact feel and workflow of Chrome's built-in Tab Search popup.\n\nIt gives Firefox a compact toolbar popup for finding open tabs by title or URL, switching to a selected tab, closing a tab from the list, restoring recently closed tabs or windows, and showing Firefox tab group names and colors when the browser exposes them.\n\nWhy install it:\n1. You want Firefox tab search to feel familiar if you already use Chrome's Tab Search.\n2. You want one popup for open tabs and recently closed tabs.\n3. You want tab group context in the search results when Firefox supports it.\n4. You want a small extension focused only on tab search, with no remote service.\n\nKnown Firefox limitations:\n1. Firefox controls extension popup sizing, so the popup cannot be made as large or as flexible as Chrome's built-in Tab Search UI.\n2. Firefox does not let extensions override existing reserved browser shortcuts such as Cmd+Shift+A. Use the included default shortcut or set another available shortcut from Firefox's extension shortcut settings."
+    "en-US": "Chrome Tab Search is for Firefox users who miss the exact feel and workflow of Chrome's built-in Tab Search popup.\n\nIt gives Firefox a compact toolbar popup for finding open tabs by title or URL, switching to a selected tab, closing a tab from the list, restoring recently closed tabs or windows, and showing Firefox tab group names and colors when the browser exposes them.\n\nWhy install it:\n1. You want Firefox tab search to feel familiar if you already use Chrome's Tab Search.\n2. You want one popup for open tabs and recently closed tabs.\n3. You want tab group context in the search results when Firefox supports it.\n4. You want a small extension focused only on tab search, with no remote service.\n\nKnown Firefox limitations:\n1. Firefox controls extension popup sizing, so the popup cannot be made as large or as flexible as Chrome's built-in Tab Search UI.\n2. Firefox does not let extensions override existing reserved browser shortcuts such as Cmd+Shift+A. Use the included default shortcut or set another available shortcut from Firefox's extension shortcut settings."
   },
   "version": {
     "license": "MIT",
@@ -21,9 +21,9 @@
   },
   "requires_payment": false,
   "homepage": {
-    "en-US": "https://github.com/wilmtang/tab-search-plus"
+    "en-US": "https://github.com/wilmtang/chrome-tab-search"
   },
   "support_url": {
-    "en-US": "https://github.com/wilmtang/tab-search-plus/issues"
+    "en-US": "https://github.com/wilmtang/chrome-tab-search/issues"
   }
 }

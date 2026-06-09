@@ -1,16 +1,16 @@
-# Tab Search Plus
+# Chrome Tab Search
 
-[![Firefox Add-ons](https://img.shields.io/badge/Firefox%20Add--ons-open-FF7139?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/tab-search-plus/)
-[![Firefox Add-ons Version](https://img.shields.io/amo/v/tab-search-plus?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/tab-search-plus/)
-[![Firefox Add-ons Users](https://img.shields.io/amo/users/tab-search-plus?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/tab-search-plus/)
-[![Firefox Extension](https://img.shields.io/github/actions/workflow/status/wilmtang/tab-search-plus/firefox-extension.yml?branch=main&label=firefox%20extension)](https://github.com/wilmtang/tab-search-plus/actions/workflows/firefox-extension.yml)
+[![Firefox Add-ons](https://img.shields.io/badge/Firefox%20Add--ons-open-FF7139?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/chrome-tab-search/)
+[![Firefox Add-ons Version](https://img.shields.io/amo/v/chrome-tab-search?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/chrome-tab-search/)
+[![Firefox Add-ons Users](https://img.shields.io/amo/users/chrome-tab-search?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/chrome-tab-search/)
+[![Firefox Extension](https://img.shields.io/github/actions/workflow/status/wilmtang/chrome-tab-search/firefox-extension.yml?branch=main&label=firefox%20extension)](https://github.com/wilmtang/chrome-tab-search/actions/workflows/firefox-extension.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 A Firefox extension that recreates Chrome's Tab Search popup: search open tabs, jump to a result, close an open tab from the list, restore recently closed tabs or windows, and see tab group color/name indicators.
 
 ## Why This Plugin
 
-Tab Search Plus is for users who like Firefox but want the exact same feel and functions of Chrome's built-in Tab Search. If your muscle memory expects one compact popup where you can type part of a tab title, jump straight to it, close noisy tabs, or bring back something you just closed, this extension is meant to make Firefox feel familiar again.
+Chrome Tab Search is for users who like Firefox but want the exact same feel and functions of Chrome's built-in Tab Search. If your muscle memory expects one compact popup where you can type part of a tab title, jump straight to it, close noisy tabs, or bring back something you just closed, this extension is meant to make Firefox feel familiar again.
 
 The goal is intentionally narrow: make tab search behave like the Chrome feature people already know, while using the Firefox WebExtension APIs available today.
 
