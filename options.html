@@ -105,6 +105,17 @@
       margin-bottom: 24px;
     }
 
+    .setting-group h2 {
+      margin: 0 0 16px 0;
+      color: var(--text-color);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .setting-field {
+      margin-bottom: 18px;
+    }
+
     label {
       display: block;
       margin-bottom: 8px;
@@ -256,6 +267,50 @@
       white-space: nowrap;
     }
 
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 84px auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary-color);
+    }
+
+    .number-input {
+      width: 84px;
+      padding: 8px 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--card-bg);
+      color: var(--text-color);
+      font: inherit;
+      font-size: 14px;
+    }
+
+    .range-value,
+    .unit-label {
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .setting-description {
+      margin: 6px 0 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .settings-actions {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 12px;
+    }
+
     .btn:active {
       transform: scale(.97);
     }
@@ -347,6 +402,14 @@
         flex-direction: column;
       }
 
+      .range-row {
+        grid-template-columns: 1fr;
+      }
+
+      .number-input {
+        width: 100%;
+      }
+
       .btn-record {
         width: 100%;
       }
@@ -382,6 +445,36 @@
       <p class="shortcut-description">
         This is Firefox's browser-action shortcut, so it opens the same popup as the toolbar button.
       </p>
+    </div>
+
+    <hr class="settings-divider">
+
+    <div class="setting-group" id="popup-appearance-settings">
+      <h2>Popup Appearance</h2>
+
+      <div class="setting-field">
+        <label for="popup-width-range">Popup width</label>
+        <div class="range-row">
+          <input id="popup-width-range" type="range" min="280" max="800" step="10">
+          <input id="popup-width-number" class="number-input" type="number" min="280" max="800" step="10" inputmode="numeric">
+          <span class="unit-label">px</span>
+        </div>
+        <p class="setting-description">Firefox caps extension popups at 800px wide.</p>
+      </div>
+
+      <div class="setting-field">
+        <label for="popup-scale-range">Popup scale</label>
+        <div class="range-row">
+          <input id="popup-scale-range" type="range" min="85" max="130" step="5">
+          <output id="popup-scale-output" class="range-value" for="popup-scale-range">100%</output>
+          <span class="unit-label">size</span>
+        </div>
+        <p class="setting-description">Scales row height, icon size, spacing, and all popup text together.</p>
+      </div>
+
+      <div class="settings-actions">
+        <button id="reset-popup-appearance" class="btn btn-secondary" type="button">Reset Appearance</button>
+      </div>
     </div>
 
     <hr class="settings-divider">

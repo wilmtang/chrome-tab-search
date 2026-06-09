@@ -7,9 +7,41 @@ if (typeof browser === "undefined") {
       async update() {},
       async reset() {},
       async openShortcutSettings() {}
+    },
+    storage: {
+      local: {
+        async get(defaults) {
+          return Object.fromEntries(Object.entries(defaults).map(([key, fallback]) => {
+            const raw = localStorage.getItem(key);
+            if (raw === null) return [key, fallback];
+
+            try {
+              return [key, JSON.parse(raw)];
+            } catch {
+              return [key, raw];
+            }
+          }));
+        },
+        async set(values) {
+          Object.entries(values).forEach(([key, value]) => {
+            localStorage.setItem(key, JSON.stringify(value));
+          });
+        }
+      }
     }
   };
 }
+
+const POPUP_WIDTH_MIN = 280;
+const POPUP_WIDTH_MAX = 800;
+const POPUP_WIDTH_DEFAULT = 320;
+const POPUP_SCALE_MIN = 0.85;
+const POPUP_SCALE_MAX = 1.3;
+const POPUP_SCALE_DEFAULT = 1;
+const popupSettingsDefaults = {
+  popupWidth: POPUP_WIDTH_DEFAULT,
+  popupFontScale: POPUP_SCALE_DEFAULT
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
   const statusDiv = document.getElementById("status");
@@ -28,6 +60,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   function isMac() {
     return navigator.platform?.toLowerCase().includes("mac") ||
       navigator.userAgent?.toLowerCase().includes("mac");
+  }
+
+  function clampNumber(value, min, max, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.min(max, Math.max(min, number));
   }
 
   const validModifiers = new Set(["Ctrl", "Alt", "Command", "MacCtrl", "Shift"]);
@@ -357,11 +395,100 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  class PopupAppearanceSettings {
+    constructor() {
+      this.widthRange = document.getElementById("popup-width-range");
+      this.widthNumber = document.getElementById("popup-width-number");
+      this.scaleRange = document.getElementById("popup-scale-range");
+      this.scaleOutput = document.getElementById("popup-scale-output");
+      this.resetButton = document.getElementById("reset-popup-appearance");
+      this.popupWidth = POPUP_WIDTH_DEFAULT;
+      this.popupFontScale = POPUP_SCALE_DEFAULT;
+
+      this.updateUI();
+      this.initEvents();
+      this.load();
+    }
+
+    async load() {
+      const stored = await browser.storage.local.get(popupSettingsDefaults);
+      this.popupWidth = clampNumber(stored.popupWidth, POPUP_WIDTH_MIN, POPUP_WIDTH_MAX, POPUP_WIDTH_DEFAULT);
+      this.popupFontScale = clampNumber(stored.popupFontScale, POPUP_SCALE_MIN, POPUP_SCALE_MAX, POPUP_SCALE_DEFAULT);
+      this.updateUI();
+    }
+
+    updateUI() {
+      const scalePercent = Math.round(this.popupFontScale * 100);
+      this.widthRange.value = String(this.popupWidth);
+      this.widthNumber.value = String(this.popupWidth);
+      this.scaleRange.value = String(scalePercent);
+      this.scaleOutput.value = `${scalePercent}%`;
+      this.scaleOutput.textContent = `${scalePercent}%`;
+    }
+
+    async save(showMessage = false) {
+      await browser.storage.local.set({
+        popupWidth: this.popupWidth,
+        popupFontScale: this.popupFontScale
+      });
+
+      if (showMessage) {
+        showStatus("Popup appearance saved.", "success");
+      }
+    }
+
+    setWidth(value) {
+      this.popupWidth = Math.round(clampNumber(value, POPUP_WIDTH_MIN, POPUP_WIDTH_MAX, POPUP_WIDTH_DEFAULT));
+      this.updateUI();
+    }
+
+    setScalePercent(value) {
+      const percent = clampNumber(value, POPUP_SCALE_MIN * 100, POPUP_SCALE_MAX * 100, POPUP_SCALE_DEFAULT * 100);
+      this.popupFontScale = Math.round(percent) / 100;
+      this.updateUI();
+    }
+
+    initEvents() {
+      this.widthRange.addEventListener("input", () => {
+        this.setWidth(this.widthRange.value);
+        this.save();
+      });
+
+      this.widthNumber.addEventListener("input", () => {
+        this.setWidth(this.widthNumber.value);
+        this.save();
+      });
+
+      this.widthNumber.addEventListener("change", () => {
+        this.setWidth(this.widthNumber.value);
+        this.save(true);
+      });
+
+      this.scaleRange.addEventListener("input", () => {
+        this.setScalePercent(this.scaleRange.value);
+        this.save();
+      });
+
+      this.scaleRange.addEventListener("change", () => {
+        this.save(true);
+      });
+
+      this.resetButton.addEventListener("click", () => {
+        this.popupWidth = POPUP_WIDTH_DEFAULT;
+        this.popupFontScale = POPUP_SCALE_DEFAULT;
+        this.updateUI();
+        this.save(true);
+      });
+    }
+  }
+
   const commands = await browser.commands.getAll();
   document.querySelectorAll(".shortcut-item").forEach((element) => {
     const commandName = element.dataset.command;
     new ShortcutItem(element, commands.find((command) => command.name === commandName));
   });
+
+  new PopupAppearanceSettings();
 
   const shortcutManagerButton = document.getElementById("open-shortcut-settings");
   shortcutManagerButton.addEventListener("click", async () => {

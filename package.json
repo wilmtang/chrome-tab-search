@@ -1,0 +1,12 @@
+{
+  "name": "tab-search-plus",
+  "private": true,
+  "scripts": {
+    "build": "web-ext build --config web-ext-config.mjs --overwrite-dest",
+    "lint": "web-ext lint --config web-ext-config.mjs",
+    "start": "web-ext run --config web-ext-config.mjs"
+  },
+  "devDependencies": {
+    "web-ext": "^10.3.0"
+  }
+}

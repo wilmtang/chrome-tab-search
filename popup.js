@@ -1,9 +1,22 @@
 (function () {
   const OPEN_COMMAND = "_execute_browser_action";
   const RECENTLY_CLOSED_LIMIT = 25;
+  const POPUP_MAX_WIDTH = 800;
+  const POPUP_MIN_WIDTH = 280;
+  const POPUP_DEFAULT_WIDTH = 320;
+  const POPUP_MAX_HEIGHT = 600;
+  const POPUP_VERTICAL_MARGIN = 96;
+  const POPUP_MIN_HEIGHT = 420;
+  const POPUP_MIN_SCALE = 0.85;
+  const POPUP_MAX_SCALE = 1.3;
+  const POPUP_DEFAULT_SCALE = 1;
   const NO_GROUP = -1;
   const api = typeof browser === "undefined" ? null : browser;
   const isMock = !api || new URLSearchParams(location.search).has("mock");
+  const popupSettingsDefaults = {
+    popupWidth: POPUP_DEFAULT_WIDTH,
+    popupFontScale: POPUP_DEFAULT_SCALE
+  };
 
   const groupColorMap = {
     grey: "#9aa0a6",
@@ -25,7 +38,9 @@
     visibleItems: [],
     selectedId: "",
     recentlyClosedExpanded: true,
-    currentWindowId: null
+    currentWindowId: null,
+    popupWidth: POPUP_DEFAULT_WIDTH,
+    popupFontScale: POPUP_DEFAULT_SCALE
   };
 
   const els = {};
@@ -36,6 +51,11 @@
     els.input = document.getElementById("search-input");
     els.shortcut = document.getElementById("shortcut-hint");
     els.results = document.getElementById("results");
+
+    await loadPopupSettings();
+    syncPopupMaxHeight();
+    window.addEventListener("resize", syncPopupMaxHeight);
+    window.visualViewport?.addEventListener("resize", syncPopupMaxHeight);
 
     await loadPopupState();
     await loadShortcutHint();
@@ -135,6 +155,30 @@
     }
 
     await api.storage.local.set({ recentlyClosedExpanded: state.recentlyClosedExpanded });
+  }
+
+  async function loadPopupSettings() {
+    const stored = await getStoredPopupSettings();
+    state.popupWidth = clampNumber(stored.popupWidth, POPUP_MIN_WIDTH, POPUP_MAX_WIDTH, POPUP_DEFAULT_WIDTH);
+    state.popupFontScale = clampNumber(stored.popupFontScale, POPUP_MIN_SCALE, POPUP_MAX_SCALE, POPUP_DEFAULT_SCALE);
+    applyPopupSettings();
+  }
+
+  async function getStoredPopupSettings() {
+    if (isMock || !api.storage) {
+      return {
+        popupWidth: readLocalSetting("popupWidth", POPUP_DEFAULT_WIDTH),
+        popupFontScale: readLocalSetting("popupFontScale", POPUP_DEFAULT_SCALE)
+      };
+    }
+
+    return api.storage.local.get(popupSettingsDefaults);
+  }
+
+  function applyPopupSettings() {
+    const root = document.documentElement;
+    root.style.setProperty("--popup-width", `${state.popupWidth}px`);
+    root.style.setProperty("--popup-scale", String(state.popupFontScale));
   }
 
   async function loadShortcutHint() {
@@ -486,6 +530,7 @@
     button.type = "button";
     button.title = "Close tab";
     button.setAttribute("aria-label", `Close ${item.title}`);
+    button.tabIndex = -1;
     button.dataset.closeTab = item.id;
     button.appendChild(createCloseIcon());
     return button;
@@ -569,6 +614,29 @@
   function closePopup() {
     if (isMock) return;
     window.close();
+  }
+
+  function syncPopupMaxHeight() {
+    const screenHeight = window.screen?.availHeight || window.screen?.height || window.innerHeight || 720;
+    const maxHeight = Math.min(POPUP_MAX_HEIGHT, Math.max(POPUP_MIN_HEIGHT, screenHeight - POPUP_VERTICAL_MARGIN));
+    document.documentElement.style.setProperty("--popup-max-height", `${Math.round(maxHeight)}px`);
+  }
+
+  function readLocalSetting(key, fallback) {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return raw;
+    }
+  }
+
+  function clampNumber(value, min, max, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.min(max, Math.max(min, number));
   }
 
   function getSelectedItem() {
@@ -714,13 +782,26 @@
 
   function getMockData() {
     const now = Date.now();
+    const mockTabCount = clampNumber(
+      new URLSearchParams(location.search).get("mockTabs"),
+      4,
+      80,
+      4
+    );
+    const openTabs = [
+      mockOpen(1, "New Tab", "about:newtab", "blue", "asdf...", now - 2 * 60 * 1000, true),
+      mockOpen(2, "wilmtang (Zod D)", "https://github.com/wilmtang/zod-discriminated", "", "", now - 2 * 60 * 1000),
+      mockOpen(3, "New Tab", "about:newtab", "", "", now - 2 * 60 * 1000),
+      mockOpen(4, "New Tab", "about:newtab", "blue", "asdfa...", now - 2 * 60 * 1000)
+    ];
+
+    for (let id = 5; id <= mockTabCount; id += 1) {
+      const minutesAgo = id < 18 ? 1 : 8;
+      openTabs.push(mockOpen(id, "New Tab", "about:newtab", "", "", now - minutesAgo * 60 * 1000));
+    }
+
     return {
-      openTabs: [
-        mockOpen(1, "New Tab", "about:newtab", "blue", "asdf...", now - 2 * 60 * 1000, true),
-        mockOpen(2, "wilmtang (Zod D)", "https://github.com/wilmtang/zod-discriminated", "", "", now - 2 * 60 * 1000),
-        mockOpen(3, "New Tab", "about:newtab", "", "", now - 2 * 60 * 1000),
-        mockOpen(4, "New Tab", "about:newtab", "blue", "asdfa...", now - 2 * 60 * 1000)
-      ],
+      openTabs,
       closedItems: [
         mockClosed(20, "Status", "https://chrome.google.com/webstore/devconsole/status", "pink", now - 11 * 60 * 1000),
         mockClosed(21, "Audience - Google Auth Platform - Chrome Web Store", "https://console.cloud.google.com/apis/credentials", "pink", now - 11 * 60 * 1000),
