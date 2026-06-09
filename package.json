@@ -4,6 +4,7 @@
   "scripts": {
     "build": "web-ext build --config web-ext-config.mjs --overwrite-dest",
     "lint": "web-ext lint --config web-ext-config.mjs",
+    "publish:firefox": "web-ext sign --config web-ext-config.mjs --channel=listed --amo-metadata amo-metadata.json --approval-timeout=0",
     "start": "web-ext run --config web-ext-config.mjs"
   },
   "devDependencies": {

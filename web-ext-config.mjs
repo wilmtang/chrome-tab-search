@@ -7,6 +7,9 @@ export default {
     "package.json",
     "package-lock.json",
     "web-ext-config.mjs",
+    "amo-metadata.json",
+    "CHANGELOG.md",
+    ".github/**",
     "web-ext-artifacts/**",
     ".git/**",
     ".gitignore"

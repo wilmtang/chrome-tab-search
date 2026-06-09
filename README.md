@@ -1,6 +1,18 @@
 # Tab Search Plus
 
+[![Firefox Add-ons](https://img.shields.io/badge/Firefox%20Add--ons-open-FF7139?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/tab-search-plus/)
+[![Firefox Add-ons Version](https://img.shields.io/amo/v/tab-search-plus?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/tab-search-plus/)
+[![Firefox Add-ons Users](https://img.shields.io/amo/users/tab-search-plus?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/tab-search-plus/)
+[![Firefox Extension](https://img.shields.io/github/actions/workflow/status/wilmtang/tab-search-plus/firefox-extension.yml?branch=main&label=firefox%20extension)](https://github.com/wilmtang/tab-search-plus/actions/workflows/firefox-extension.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 A Firefox extension that recreates Chrome's Tab Search popup: search open tabs, jump to a result, close an open tab from the list, restore recently closed tabs or windows, and see tab group color/name indicators.
+
+## Why This Plugin
+
+Tab Search Plus is for users who like Firefox but want the exact same feel and functions of Chrome's built-in Tab Search. If your muscle memory expects one compact popup where you can type part of a tab title, jump straight to it, close noisy tabs, or bring back something you just closed, this extension is meant to make Firefox feel familiar again.
+
+The goal is intentionally narrow: make tab search behave like the Chrome feature people already know, while using the Firefox WebExtension APIs available today.
 
 ## Features
 
@@ -26,6 +38,31 @@ Temporary add-ons are removed when Firefox restarts.
 ## Shortcut
 
 The shortcut is implemented with Firefox's `_execute_browser_action` command, so it opens the exact same popup as the toolbar button. You can change it from the extension options page or Firefox's built-in extension shortcut manager.
+
+Firefox does not let extensions override reserved browser shortcuts. In particular, `Cmd + Shift + A` is already owned by Firefox on macOS, so this extension cannot claim it. The default shortcut is `Cmd + Ctrl + A` on macOS and `Ctrl + Alt + A` on Windows/Linux.
+
+## Limitations
+
+- Firefox controls extension popup sizing, so the popup cannot be made as large or as flexible as Chrome's built-in Tab Search UI.
+- Firefox does not let extensions override existing reserved browser shortcuts such as `Cmd + Shift + A`.
+
+These are browser limitations rather than extension bugs, so they cannot be fixed from this plugin.
+
+## Publishing
+
+Firefox publication is handled by `.github/workflows/firefox-extension.yml`. The workflow validates every relevant pull request and push, and uploads to Firefox Add-ons when either:
+
+- a `firefox-extension-v*` tag is pushed, for example `firefox-extension-v1.0.0`, and the tag version matches `manifest.json`;
+- the workflow is run manually with `publish=true`.
+
+Add `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` to the `firefox-addons` GitHub Actions environment. The workflow passes them to `web-ext` as `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET`.
+
+Local release checks:
+
+```bash
+npm run lint
+npm run build
+```
 
 ## Notes
 
