@@ -74,6 +74,13 @@
         linear-gradient(135deg, #fbf8ff 0%, #fff 48%, #fff8f3 100%);
     }
 
+    .shot.media {
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 113, 57, .2), transparent 26%),
+        radial-gradient(circle at 91% 78%, rgba(69, 161, 255, .18), transparent 28%),
+        linear-gradient(135deg, #fff8f3 0%, #fff 46%, #f4fbff 100%);
+    }
+
     .copy {
       position: absolute;
       left: 76px;
@@ -278,6 +285,11 @@
       top: 120px;
     }
 
+    .media .popup-wrap {
+      right: 98px;
+      top: 118px;
+    }
+
     .tab-search-panel {
       width: var(--popup-width);
       max-height: 600px;
@@ -305,6 +317,10 @@
 
     .group-chip {
       max-width: 116px;
+    }
+
+    .media-alert-icon {
+      margin-left: 5px;
     }
 
     .settings-frame {
@@ -528,7 +544,7 @@
         </header>
         <section class="results" role="listbox" aria-label="Tab search results">
           <section class="section">
-            <div class="section-title">Open Tabs</div>
+            <div class="section-title" id="open-title">Open Tabs</div>
             <div class="rows" id="open-rows"></div>
           </section>
           <section class="section" id="closed-section"></section>
@@ -623,6 +639,24 @@
           row("closed-3", "MDN sessions.restore()", "developer.mozilla.org", "Research", now - 51 * 60000, false)
         ]
       },
+      media: {
+        className: "media",
+        query: "",
+        address: "youtube.com/watch?v=tab-search",
+        headline: "Find the tab playing audio",
+        supporting: "Audible and muted tabs rise into their own Audio & Video section before the rest of your open tabs.",
+        audio: [
+          row("media-1", "Design Critique - Live Stream", "youtube.com", "Media", now - 1 * 60000, true, true, false, "audio"),
+          row("media-2", "Focus playlist - muted", "music.example.com", "Audio", now - 3 * 60000, true, false, true, "muted")
+        ],
+        open: [
+          row("open-1", "Chrome Tab Search - GitHub", "github.com", "Work", now - 5 * 60000, true),
+          row("open-2", "MDN tabs API", "developer.mozilla.org", "Research", now - 8 * 60000, true),
+          row("open-3", "Firefox Add-ons Developer Hub", "addons.mozilla.org", "Store", now - 14 * 60000, true),
+          row("open-4", "Release checklist", "notion.so", "Release", now - 21 * 60000, true)
+        ],
+        closed: []
+      },
       settings: {
         className: "settings",
         query: "",
@@ -634,8 +668,8 @@
       }
     };
 
-    function row(id, title, meta, group, time, open, selected = false, closeVisible = false) {
-      return { id, title, meta, group, time, open, selected, closeVisible };
+    function row(id, title, meta, group, time, open, selected = false, closeVisible = false, media = "") {
+      return { id, title, meta, group, time, open, selected, closeVisible, media };
     }
 
     function formatTime(time) {
@@ -652,6 +686,14 @@
 
     function closeIcon() {
       return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>';
+    }
+
+    function mediaIcon(type) {
+      if (!type) return "";
+      const extra = type === "muted"
+        ? '<path d="m17 9 4 4m0-4-4 4"></path>'
+        : '<path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12"></path>';
+      return `<svg class="media-alert-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"></path>${extra}</svg>`;
     }
 
     function chevronIcon() {
@@ -675,7 +717,7 @@
         <div class="${classes.join(" ")}" role="option" aria-selected="${item.selected ? "true" : "false"}">
           <span class="favicon-shell">${iconSvg(!item.open)}</span>
           <span class="tab-copy">
-            <span class="tab-title">${item.title}</span>
+            <span class="tab-title"><span class="tab-title-text">${item.title}</span>${mediaIcon(item.media)}</span>
             <span class="tab-meta">${group}<span class="meta-text">${item.meta}</span><span class="meta-separator">•</span><span class="meta-text">${formatTime(item.time)}</span></span>
           </span>
           ${action}
@@ -694,6 +736,19 @@
       document.getElementById("address").textContent = shot.address;
       document.getElementById("search-input").value = shot.query;
 
+      const audioSection = document.getElementById("audio-section");
+      audioSection?.remove();
+      if (shot.audio?.length) {
+        const section = document.createElement("section");
+        section.className = "section";
+        section.id = "audio-section";
+        section.innerHTML = `
+          <div class="section-title">Audio &amp; Video</div>
+          <div class="rows">${shot.audio.map(renderRow).join("")}</div>`;
+        document.getElementById("open-rows").closest(".section").before(section);
+      }
+
+      document.getElementById("open-title").textContent = shot.openTitle || "Open Tabs";
       document.getElementById("open-rows").innerHTML = shot.open.map(renderRow).join("");
       const closed = document.getElementById("closed-section");
       closed.innerHTML = "";
@@ -703,6 +758,7 @@
           <div class="rows">${shot.closed.map((item) => renderRow({ ...item, open: false })).join("")}</div>`;
       }
 
+      document.getElementById("popup-wrap").classList.toggle("dark-demo", name === "media");
       document.getElementById("popup-wrap").hidden = name === "settings";
       document.getElementById("settings-frame").hidden = name !== "settings";
       document.getElementById("keyline").hidden = name === "settings";

@@ -6,11 +6,11 @@
 [![Firefox Extension](https://img.shields.io/github/actions/workflow/status/wilmtang/chrome-tab-search/firefox-extension.yml?branch=main&label=firefox%20extension)](https://github.com/wilmtang/chrome-tab-search/actions/workflows/firefox-extension.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-A Firefox extension that recreates Chrome's Tab Search popup: search open tabs, jump to a result, close an open tab from the list, restore recently closed tabs or windows, and see tab group color/name indicators.
+A Firefox extension that recreates Chrome's Tab Search popup: search open tabs, jump to a result, spot tabs that are playing audio, close an open tab from the list, restore recently closed tabs or windows, and see tab group color/name indicators.
 
 ## Why This Plugin
 
-Chrome Tab Search is for users who like Firefox but want the exact same feel and functions of Chrome's built-in Tab Search. If your muscle memory expects one compact popup where you can type part of a tab title, jump straight to it, close noisy tabs, or bring back something you just closed, this extension is meant to make Firefox feel familiar again.
+Chrome Tab Search is for users who like Firefox but want the exact same feel and workflow of Chrome's built-in Tab Search. If your muscle memory expects one compact popup where you can type part of a tab title, jump straight to it, find the tab that is playing audio, close noisy tabs, or bring back something you just closed, this extension is meant to make Firefox feel familiar again.
 
 The goal is intentionally narrow: make tab search behave like the Chrome feature people already know, while using the Firefox WebExtension APIs available today.
 
@@ -19,7 +19,7 @@ The goal is intentionally narrow: make tab search behave like the Chrome feature
 - Chrome-style popup with dark-mode support.
 - Chrome-matched MRU ordering, with the current focused-window tab moved to the bottom so Enter quickly switches to another tab.
 - Chrome-style ranked search across tab title, hostname, and visible tab group name, with bold hit highlighting.
-- Audio & Video section for audible or muted tabs when not searching.
+- Audio & Video section for audible or muted tabs when not searching, including speaker and muted indicators.
 - Recently Closed parity with flattened closed windows, duplicate filtering, and the same compact display limit Chrome uses.
 - Switch to tabs across normal Firefox windows.
 - Close open tabs from the right-side close button.
