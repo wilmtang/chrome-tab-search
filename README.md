@@ -59,6 +59,8 @@ Firefox publication is handled by `.github/workflows/firefox-extension.yml`. The
 
 Add `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` to the `firefox-addons` GitHub Actions environment. The workflow passes them to `web-ext` as `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET`.
 
+Listed AMO uploads use `--approval-timeout=0`, so CI submits the version and exits without waiting for Mozilla approval or downloading the signed `.xpi`. After approval, the signed file is available from the version page in Firefox Add-ons Developer Hub.
+
 Local release checks:
 
 ```bash

@@ -161,10 +161,3 @@ jobs:
           WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: npm run publish:firefox
-
-      - name: Upload signed artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: firefox-extension-signed
-          path: web-ext-artifacts/*.xpi
-          if-no-files-found: warn
