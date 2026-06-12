@@ -420,7 +420,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateUI() {
       const scalePercent = Math.round(this.popupFontScale * 100);
       this.widthRange.value = String(this.popupWidth);
-      this.widthNumber.value = String(this.popupWidth);
+      // Don't overwrite the width field while it is being typed in, otherwise
+      // every keystroke is clamped and rewritten mid-entry (e.g. typing "500"
+      // snaps the field to "280" after the first digit). The change handler
+      // normalizes it on commit.
+      if (document.activeElement !== this.widthNumber) {
+        this.widthNumber.value = String(this.popupWidth);
+      }
       this.scaleRange.value = String(scalePercent);
       this.scaleOutput.value = `${scalePercent}%`;
       this.scaleOutput.textContent = `${scalePercent}%`;
@@ -455,12 +461,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       this.widthNumber.addEventListener("input", () => {
+        // Mirror the typed value to the slider live, but defer saving (and
+        // field normalization) to the change handler so a clamped partial
+        // value isn't persisted mid-typing.
         this.setWidth(this.widthNumber.value);
-        this.save();
       });
 
       this.widthNumber.addEventListener("change", () => {
         this.setWidth(this.widthNumber.value);
+        // Normalize the field to the clamped value even if it is still focused
+        // (e.g. committed with Enter rather than blur).
+        this.widthNumber.value = String(this.popupWidth);
         this.save(true);
       });
 

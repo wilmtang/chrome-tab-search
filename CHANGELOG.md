@@ -12,9 +12,11 @@ All notable changes to Chrome Tab Search will be documented in this file.
 - Flatten recently closed windows into individual tab rows, filter duplicates, and limit the default Recently Closed view to 8 items.
 - Update mock mode to cover media tabs, search ranking, highlighting, closed-window flattening, and duplicate filtering.
 - Keep the result selection near its previous position after closing a tab instead of jumping back to the top.
+- Match Chrome by rendering favicons inside rounded tiles instead of bare icons.
 
 ### Fixed
 - Restore tabs from a closed window by reopening their URL when Firefox cannot session-restore them, so the popup no longer hangs on those rows.
+- Allow typing a multi-digit popup width in the options page; the field no longer clamps and overwrites itself on every keystroke.
 
 ## [1.0.0]
 ### Added
