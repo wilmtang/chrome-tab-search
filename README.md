@@ -52,7 +52,7 @@ These are browser limitations rather than extension bugs, so they cannot be fixe
 
 ## Publishing
 
-Firefox publication is handled by `.github/workflows/firefox-extension.yml`. The workflow validates every relevant pull request and push, and uploads to Firefox Add-ons when either:
+Firefox publication is handled by `.github/workflows/firefox-extension.yml`. The workflow validates every relevant pull request and push. When a push to `main` changes `manifest.json`'s version, the workflow automatically creates a matching `firefox-extension-v*` tag. Firefox Add-ons upload runs when either:
 
 - a `firefox-extension-v*` tag is pushed, for example `firefox-extension-v1.0.0`, and the tag version matches `manifest.json`;
 - the workflow is run manually with `publish=true`.

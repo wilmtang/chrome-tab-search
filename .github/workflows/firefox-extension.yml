@@ -74,6 +74,59 @@ jobs:
           path: web-ext-artifacts/*.zip
           if-no-files-found: error
 
+  auto-tag:
+    name: Create Firefox release tag
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Create tag when manifest version changes
+        run: |
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "No previous commit is available for this push; skipping auto-tag."
+            exit 0
+          fi
+
+          if ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            echo "Previous commit $BEFORE is not available; skipping auto-tag."
+            exit 0
+          fi
+
+          OLD_VERSION="$(git show "$BEFORE:manifest.json" | node -e "const fs = require('fs'); console.log(JSON.parse(fs.readFileSync(0, 'utf8')).version)")"
+          NEW_VERSION="$(node -p "require('./manifest.json').version")"
+
+          if [ "$OLD_VERSION" = "$NEW_VERSION" ]; then
+            echo "manifest.json version did not change ($NEW_VERSION); skipping auto-tag."
+            exit 0
+          fi
+
+          TAG="firefox-extension-v$NEW_VERSION"
+
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null || git ls-remote --exit-code --tags origin "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists; skipping auto-tag."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" "$AFTER" -m "$TAG"
+          git push origin "$TAG"
+
   publish:
     name: Upload to Firefox Add-ons
     needs: validate
