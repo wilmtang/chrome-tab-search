@@ -9,6 +9,8 @@ export default {
     "web-ext-config.mjs",
     "scripts",
     "scripts/**",
+    "store-screenshots",
+    "store-screenshots/**",
     "amo-metadata.json",
     "CHANGELOG.md",
     ".github/**",

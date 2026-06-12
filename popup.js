@@ -398,12 +398,16 @@
     const title = tab.title || displayUrl(tab.url) || "Untitled";
     const url = tab.url || "";
     const hostname = displayUrl(url);
+    // Firefox stringifies closedIds as integers; tabs inside a closed window
+    // have no closedId, so the API returns the literal "undefined". Keep the
+    // id only when it is restorable and fall back to a unique index-based id.
+    const restorableSessionId = isRestorableSessionId(sessionId) ? sessionId : "";
 
     return {
-      id: `closed-${sessionId || index}`,
+      id: `closed-${restorableSessionId || index}`,
       type: "closed",
       restoreType: "tab",
-      sessionId,
+      sessionId: restorableSessionId,
       title,
       url,
       hostname,
@@ -411,6 +415,10 @@
       favIconUrl: tab.favIconUrl || "",
       lastTime: lastModified || Date.now()
     };
+  }
+
+  function isRestorableSessionId(sessionId) {
+    return typeof sessionId === "string" ? /^\d+$/.test(sessionId) : Number.isInteger(sessionId);
   }
 
   function sortOpenTabs(a, b) {
@@ -723,10 +731,16 @@
     }
 
     if (!isMock) {
-      if (item.sessionId) {
-        await api.sessions.restore(item.sessionId);
-      } else if (item.url) {
-        await api.tabs.create({ url: item.url });
+      try {
+        if (item.sessionId) {
+          await api.sessions.restore(item.sessionId);
+        } else if (item.url) {
+          await api.tabs.create({ url: item.url });
+        }
+      } catch {
+        // Some recently closed entries (e.g. tabs from a closed window) cannot
+        // be session-restored. Fall back to reopening the URL directly.
+        if (item.url) await api.tabs.create({ url: item.url }).catch(() => {});
       }
     }
     closePopup();
@@ -735,14 +749,33 @@
   async function closeOpenTab(item) {
     if (!item || item.type !== "open") return;
 
+    // Remember where the closed row sat so we can keep the selection nearby
+    // (Chrome clamps the selected index rather than jumping back to the top).
+    const closedIndex = state.visibleItems.findIndex((entry) => entry.id === item.id);
+    const wasSelected = state.selectedId === item.id;
+
     if (!isMock) {
       await api.tabs.remove(item.tabId);
       await refreshData();
-      return;
+    } else {
+      state.openTabs = state.openTabs.filter((tab) => tab.id !== item.id);
+      render();
     }
 
-    state.openTabs = state.openTabs.filter((tab) => tab.id !== item.id);
-    render();
+    if (wasSelected && closedIndex !== -1) {
+      restoreSelectionNear(closedIndex);
+    }
+  }
+
+  function restoreSelectionNear(index) {
+    if (state.visibleItems.length === 0) return;
+
+    // render() already reset the selection to the default top row; override it
+    // with the row that now occupies the closed item's position (clamped).
+    const nextIndex = Math.min(index, state.visibleItems.length - 1);
+    state.selectedId = state.visibleItems[nextIndex].id;
+    renderSelection();
+    document.getElementById(state.selectedId)?.scrollIntoView({ block: "nearest" });
   }
 
   function closePopup() {
@@ -1103,10 +1136,10 @@
       mockClosedTab(20, "Duplicate open Chromium search.ts", "https://chromium.googlesource.com/chromium/src/+/main/chrome/browser/resources/tab_search/search.ts", now - 5 * 60 * 1000),
       mockClosedTab(21, "Chrome Tab Search review notes", "https://github.com/zihaod/chrome-tab-search/pull/12/files", now - 6 * 60 * 1000),
       mockClosedWindow(22, [
-        mockSessionTab(221, "Prefix ranking from closed window", "https://example.com/prefix-ranking"),
-        mockSessionTab(222, "Word boundary ranking", "https://example.com/docs/boundary-ranking"),
-        mockSessionTab(223, "Duplicate open parity plan", "https://github.com/zihaod/chrome-tab-search/pull/12"),
-        mockSessionTab(224, "Closed New Tab", "about:newtab")
+        mockWindowTab("Prefix ranking from closed window", "https://example.com/prefix-ranking"),
+        mockWindowTab("Word boundary ranking", "https://example.com/docs/boundary-ranking"),
+        mockWindowTab("Duplicate open parity plan", "https://github.com/zihaod/chrome-tab-search/pull/12"),
+        mockWindowTab("Closed New Tab", "about:newtab")
       ], now - 8 * 60 * 1000),
       mockClosedTab(23, "Smart quote “closed” result", "https://quotes.example.com/closed", now - 11 * 60 * 1000),
       mockClosedTab(24, "Audio recording notes", "https://media.example.com/recording", now - 16 * 60 * 1000),
@@ -1173,6 +1206,18 @@
   function mockSessionTab(id, title, url) {
     return {
       sessionId: String(id),
+      title,
+      url,
+      favIconUrl: mockFavicon(url)
+    };
+  }
+
+  // Tabs inside a closed window have no closedId, so Firefox returns the
+  // literal string "undefined" for their sessionId. Mirror that here so mock
+  // mode exercises the restore fallback path.
+  function mockWindowTab(title, url) {
+    return {
+      sessionId: String(undefined),
       title,
       url,
       favIconUrl: mockFavicon(url)

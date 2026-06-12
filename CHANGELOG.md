@@ -11,6 +11,10 @@ All notable changes to Chrome Tab Search will be documented in this file.
 - Sort open tabs by most-recent use while moving the active tab in the focused window to the bottom.
 - Flatten recently closed windows into individual tab rows, filter duplicates, and limit the default Recently Closed view to 8 items.
 - Update mock mode to cover media tabs, search ranking, highlighting, closed-window flattening, and duplicate filtering.
+- Keep the result selection near its previous position after closing a tab instead of jumping back to the top.
+
+### Fixed
+- Restore tabs from a closed window by reopening their URL when Firefox cannot session-restore them, so the popup no longer hangs on those rows.
 
 ## [1.0.0]
 ### Added
